@@ -11,7 +11,6 @@ import android.widget.ImageView;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -23,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     Bitmap grayBitmap;
     Bitmap cannyBitmap;
     Bitmap linesBitmap;
+    Bitmap origBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         srcBitmap.recycle();
         grayBitmap.recycle();
+        cannyBitmap.recycle();
+        linesBitmap.recycle();
+        origBitmap.recycle();
         finish();
     }
 
@@ -72,14 +75,31 @@ public class MainActivity extends AppCompatActivity {
 
         Mat rgbMat = new Mat();
         Mat grayMat = new Mat();
+        Mat cannyMat;
+        Mat linesMat = new Mat();
         BitmapFactory.Options o=new BitmapFactory.Options();
 
         // TODO: 29/08/2016  May need to check sample size https://developer.android.com/training/displaying-bitmaps/load-bitmap.html
-        o.inSampleSize = 6;
+        o.inSampleSize = 4;
         o.inDither=false;
-        srcBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card, o);
-        grayBitmap = Bitmap.createBitmap(srcBitmap.getWidth(), srcBitmap.getHeight(), Bitmap.Config.RGB_565);
+
+
+        // resize
+        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card2, o);
+
+        int w = origBitmap.getWidth();
+        int h = origBitmap.getHeight();
+        int min_w = 800;
+        double scale = Math.min(10.0, w*1.0/ min_w);
+        int w_proc = (int) (w * 1.0 / scale);
+        int h_proc = (int) (h * 1.0 / scale);
+        srcBitmap = Bitmap.createScaledBitmap(origBitmap, w_proc, h_proc, false);
+        grayBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
+        cannyBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
+        linesBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
         Utils.bitmapToMat(srcBitmap, rgbMat);//convert original bitmap to Mat, R G B.
+
+        // grayscale
         Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);//rgbMat to gray grayMat
         Utils.matToBitmap(grayMat, grayBitmap); //convert mat to bitmap
         img.setImageBitmap(grayBitmap);
@@ -96,11 +116,20 @@ public class MainActivity extends AppCompatActivity {
         o.inSampleSize = 4;
         o.inDither=false;
 
+
         // resize
-        srcBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card, o);
-        grayBitmap = Bitmap.createBitmap(srcBitmap.getWidth(), srcBitmap.getHeight(), Bitmap.Config.RGB_565);
-        cannyBitmap = Bitmap.createBitmap(srcBitmap.getWidth(), srcBitmap.getHeight(), Bitmap.Config.RGB_565);
-        linesBitmap = Bitmap.createBitmap(srcBitmap.getWidth(), srcBitmap.getHeight(), Bitmap.Config.RGB_565);
+        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card2, o);
+
+        int w = origBitmap.getWidth();
+        int h = origBitmap.getHeight();
+        int min_w = 800;
+        double scale = Math.min(10.0, w*1.0/ min_w);
+        int w_proc = (int) (w * 1.0 / scale);
+        int h_proc = (int) (h * 1.0 / scale);
+        srcBitmap = Bitmap.createScaledBitmap(origBitmap, w_proc, h_proc, false);
+        grayBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
+        cannyBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
+        linesBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
         Utils.bitmapToMat(srcBitmap, rgbMat);//convert original bitmap to Mat, R G B.
 
         // grayscale
@@ -111,16 +140,13 @@ public class MainActivity extends AppCompatActivity {
 
         // HoughLinesP
 
-        int w = srcBitmap.getWidth();
-        int min_w = 200;
-        double scale = Math.min(10.0, w*1.0/ min_w);
-        int w_proc = (int) (w * 1.0 / scale);
-        Imgproc.HoughLinesP(cannyMat,linesMat, 1, Math.PI/180, w_proc/3, w_proc/3, 20 );
 
-        Log.e("opencv","lines.cols" + linesMat.cols());
-        for (int x = 0; x < linesMat.cols(); x++)
+        Imgproc.HoughLinesP(cannyMat,linesMat, 1, Math.PI/180, w_proc/12, w_proc/12, 20 );
+
+        Log.e("opencv","lines.cols " + linesMat.cols() + " w_proc/3: " + w_proc/3);
+        for (int x = 0; x < linesMat.rows(); x++)
         {
-            double[] vec = linesMat.get(0, x);
+            double[] vec = linesMat.get(x, 0);
             double x1 = vec[0],
                     y1 = vec[1],
                     x2 = vec[2],
