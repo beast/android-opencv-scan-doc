@@ -6,7 +6,7 @@ include $(CLEAR_VARS)
 OpenCV_INSTALL_MODULES := on
 OpenCV_CAMERA_MODULES := off
 
-OPENCV_LIB_TYPE :=STATIC
+OPENCV_LIB_TYPE := SHARED
 
 ifeq ("$(wildcard $(OPENCV_MK_PATH))","")
 include ../../../../native/jni/OpenCV.mk

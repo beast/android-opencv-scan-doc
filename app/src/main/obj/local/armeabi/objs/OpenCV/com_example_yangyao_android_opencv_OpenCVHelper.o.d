@@ -1,6 +1,6 @@
-/Users/yangyao/Developer/android_opencv/app/src/main/obj/local/armeabi/objs/OpenCV/com_example_yangyao_android_opencv_OpenCVHelper.o: \
- /Users/yangyao/Developer/android_opencv/app/src/main/jni/com_example_yangyao_android_opencv_OpenCVHelper.cpp \
- /Users/yangyao/Developer/android_opencv/app/src/main/jni/com_example_yangyao_android_opencv_OpenCVHelper.h \
+/Users/yangyao/Developer/android-opencv-scan-doc/app/src/main/obj/local/armeabi/objs/OpenCV/com_example_yangyao_android_opencv_OpenCVHelper.o: \
+ /Users/yangyao/Developer/android-opencv-scan-doc/app/src/main/jni/com_example_yangyao_android_opencv_OpenCVHelper.cpp \
+ /Users/yangyao/Developer/android-opencv-scan-doc/app/src/main/jni/com_example_yangyao_android_opencv_OpenCVHelper.h \
  ../../../../native/jni/include/opencv2/opencv.hpp \
  ../../../../native/jni/include/opencv2/core.hpp \
  ../../../../native/jni/include/opencv2/core/cvdef.h \
@@ -66,7 +66,7 @@
  /Users/yangyao/Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/include/map \
  /Users/yangyao/Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/include/iostream
 
-/Users/yangyao/Developer/android_opencv/app/src/main/jni/com_example_yangyao_android_opencv_OpenCVHelper.h:
+/Users/yangyao/Developer/android-opencv-scan-doc/app/src/main/jni/com_example_yangyao_android_opencv_OpenCVHelper.h:
 
 ../../../../native/jni/include/opencv2/opencv.hpp:
 
