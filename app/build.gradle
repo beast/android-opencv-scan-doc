@@ -1,0 +1,64 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        applicationId "com.example.yangyao.android_opencv"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+
+        ndk {
+            moduleName "OpenCV"
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets.main.jni.srcDirs = []
+    //禁止自带的ndk功能
+    sourceSets.main.jniLibs.srcDirs = ['src/main/libs','src/main/jniLibs']
+    //重定向so目录为src/main/libs和src/main/jniLibs，原来为src/main/jniLibs
+
+    task ndkBuild(type: Exec, description: 'Compile JNI source with NDK') {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def ndkDir = properties.getProperty('ndk.dir')
+
+        if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
+            commandLine "$ndkDir/ndk-build.cmd", '-C', file('src/main/jni').absolutePath
+        } else {
+            commandLine "$ndkDir/ndk-build", '-C', file('src/main/jni').absolutePath
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
+    }
+
+    task ndkClean(type: Exec, description: 'Clean NDK Binaries') {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def ndkDir = properties.getProperty('ndk.dir')
+
+        if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
+            commandLine "$ndkDir/ndk-build.cmd",'clean', '-C', file('src/main/jni').absolutePath
+        } else {
+            commandLine "$ndkDir/ndk-build",'clean', '-C', file('src/main/jni').absolutePath
+        }
+    }
+
+    clean.dependsOn 'ndkClean'
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+}
