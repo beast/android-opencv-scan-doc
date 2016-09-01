@@ -16,6 +16,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -159,8 +160,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Calculate horizontal lines and vertical lines
         Log.e("opencv","lines.cols " + linesMat.cols() + " w_proc/3: " + w_proc/3);
-        List<Line> horizontals = null;
-        List<Line> verticals = null;
+        List<Line> horizontals = new ArrayList<>();
+        List<Line> verticals = new ArrayList<>();
         for (int x = 0; x < linesMat.rows(); x++)
         {
             double[] vec = linesMat.get(x, 0);
@@ -208,27 +209,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Collections.sort(horizontals, new Comparator<Line>() {
+        Collections.sort(verticals, new Comparator<Line>() {
             @Override
             public int compare(Line lhs, Line rhs) {
                 return (int)(lhs._center.x - rhs._center.x);
             }
         });
 
+
         // for visualization in debug mode
         if (BuildConfig.DEBUG) {
-            Imgproc.line(cannyMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
-            Imgproc.line(cannyMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
-            Imgproc.line(cannyMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
-            Imgproc.line(cannyMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
+            Imgproc.line(rgbMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(0,255,0), 10, Imgproc.LINE_AA, 0);
+            Imgproc.line(rgbMat, horizontals.get(horizontals.size()-1)._p1, horizontals.get(horizontals.size()-1)._p2, new Scalar(0,255,0), 10, Imgproc.LINE_AA, 0);
+            Imgproc.line(rgbMat, verticals.get(0)._p1, verticals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
+            Imgproc.line(rgbMat, verticals.get(verticals.size()-1)._p1, verticals.get(verticals.size()-1)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
         }
 
 
         Log.e("opencv","completed HoughLines");
         Log.e("opencv","linesMat size: " + linesMat.size());
         Log.e("opencv", "linesBitmap size: " + Integer.toString(linesBitmap.getHeight()) +" x " + Integer.toString(linesBitmap.getWidth()));
-        Utils.matToBitmap(cannyMat, cannyBitmap); //convert mat to bitmap
-        img.setImageBitmap(cannyBitmap);
+        Utils.matToBitmap(rgbMat, srcBitmap); //convert mat to bitmap
+        img.setImageBitmap(srcBitmap);
     }
 
     protected Mat getCanny(Mat gray) {
