@@ -5,5 +5,5 @@ OpenCV will be in JAVA and no OpenCVManager is needed.
 # Features (Work in progress)
 - [x] Grayscale
 - [x] Auto crop
-- [] Add Camera
-- [] Magic Color
+- [ ] Add Camera
+- [ ] Magic Color
