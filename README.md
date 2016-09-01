@@ -1,5 +1,6 @@
 # android-opencv-scan-doc
-Auto crop documents in a scanned image or photo with OpenCV.
+Auto crop documents in a scanned image or photo with OpenCV. Inspired by 'https://github.com/daisygao/ScannerLite/'
 OpenCV will be in JAVA and no OpenCVManager is needed.
 
-This is Work in Progress
+# Installation
+Simply in

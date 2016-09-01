@@ -119,8 +119,6 @@ public class MainActivity extends AppCompatActivity {
 
         Mat rgbMat = new Mat();
         Mat grayMat = new Mat();
-        Mat cannyMat;
-        Mat linesMat = new Mat();
         BitmapFactory.Options o=new BitmapFactory.Options();
 
         // TODO: 29/08/2016  May need to check sample size https://developer.android.com/training/displaying-bitmaps/load-bitmap.html
@@ -139,8 +137,6 @@ public class MainActivity extends AppCompatActivity {
         int h_proc = (int) (h * 1.0 / scale);
         srcBitmap = Bitmap.createScaledBitmap(origBitmap, w_proc, h_proc, false);
         grayBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
-        cannyBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
-        linesBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
         Utils.bitmapToMat(srcBitmap, rgbMat);//convert original bitmap to Mat, R G B.
 
         // grayscale
