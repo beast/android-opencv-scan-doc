@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // resize
-        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card9, o);
+        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card4, o);
 
         int w = origBitmap.getWidth();
         int h = origBitmap.getHeight();
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // resize
-        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card9, o);
+        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card4, o);
 
         int w = origBitmap.getWidth();
         int h = origBitmap.getHeight();
@@ -293,14 +293,8 @@ public class MainActivity extends AppCompatActivity {
         Log.e("Intersections", Double.toString(intersections.get(0).x));
 
         // perspective tranform
-        // source Mat from earlier intersection calculations
-        Mat srcMat = new Mat(4,1,CvType.CV_32FC2);
-        srcMat.put(0,0,intersections.get(0).x,intersections.get(0).y,intersections.get(1).x,intersections.get(1).y,intersections.get(2).x,intersections.get(2).y,intersections.get(3).x,intersections.get(3).y);
 
-        // destination Mat
-
-//        dstMat.put(0,0, 0.0,0.0,w_a4-1,0.0,0.0,h_a4-1,w_a4-1,h_a4-1);
-
+        // Calculate max width and height
         double w1 = Math.sqrt( Math.pow(intersections.get(3).x - intersections.get(2).x , 2) + Math.pow(intersections.get(3).x - intersections.get(2).x , 2));
         double w2 = Math.sqrt( Math.pow(intersections.get(1).x - intersections.get(0).x , 2) + Math.pow(intersections.get(1).x - intersections.get(0).x , 2));
         double h1 = Math.sqrt( Math.pow(intersections.get(1).y - intersections.get(3).y , 2) + Math.pow(intersections.get(1).y - intersections.get(3).y , 2));
@@ -309,18 +303,22 @@ public class MainActivity extends AppCompatActivity {
         double maxWidth = (w1 < w2) ? w1 : w2;
         double maxHeight = (h1 < h2) ? h1 : h2;
 
-        Mat dstMat = new Mat();
-        dstMat.zeros((int)maxHeight,(int)maxWidth,CvType.CV_32FC2);
+        // source Mat from earlier intersection calculations
+        Mat srcMat = new Mat(4,1,CvType.CV_32FC2);
+        srcMat.put(0,0,intersections.get(0).x,intersections.get(0).y,intersections.get(1).x,intersections.get(1).y,intersections.get(2).x,intersections.get(2).y,intersections.get(3).x,intersections.get(3).y);
 
+        Mat dstMat = new Mat(4,1,CvType.CV_32FC2);
         dstMat.put(0,0, 0.0,0.0, maxWidth-1,0.0, 0.0,maxHeight-1, maxWidth-1, maxHeight-1);
+//        dstMat.put(0,0, 0.0,0.0, w_a4-1,0.0, 0.0,h_a4-1, w_a4-1, h_a4-1);
+//        dstMat.put(0,0,intersections.get(0).x,intersections.get(0).y,intersections.get(1).x,intersections.get(1).y,intersections.get(2).x,intersections.get(2).y,intersections.get(3).x,intersections.get(3).y);
 
-
+        Log.e("FinalDisplay","srcMat: " + srcMat.size());
+        Log.e("FinalDisplay","dstMat: " + dstMat.size());
 
 //        // transformation matrix
         Mat transformMatrix = Imgproc.getPerspectiveTransform(srcMat,dstMat);
-        Log.e("FinalDisplay","srcMat: " + srcMat.size());
-        Log.e("FinalDisplay","dstMat: " + dstMat.size());
-        Mat finalMat = Mat.zeros(h_a4,w_a4,CvType.CV_32FC2);
+
+        Mat finalMat = Mat.zeros((int)maxHeight, (int)maxWidth ,CvType.CV_32FC2);
         Imgproc.warpPerspective(rgbMat, finalMat, transformMatrix, finalMat.size());
         Log.e("FinalDisplay","finalMat: " + finalMat.size());
 
