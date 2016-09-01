@@ -16,6 +16,22 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+class Line{
+    Point _p1;
+    Point _p2;
+    Point _center;
+
+    Line(Point p1, Point p2) {
+        _p1 = p1;
+        _p2 = p2;
+        _center = new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+    }
+}
+
 public class MainActivity extends AppCompatActivity {
 
     Bitmap srcBitmap;
@@ -139,11 +155,12 @@ public class MainActivity extends AppCompatActivity {
         cannyMat = getCanny(grayMat);
 
         // HoughLinesP
-
-
         Imgproc.HoughLinesP(cannyMat,linesMat, 1, Math.PI/180, w_proc/12, w_proc/12, 20 );
 
+        // Calculate horizontal lines and vertical lines
         Log.e("opencv","lines.cols " + linesMat.cols() + " w_proc/3: " + w_proc/3);
+        List<Line> horizontals = null;
+        List<Line> verticals = null;
         for (int x = 0; x < linesMat.rows(); x++)
         {
             double[] vec = linesMat.get(x, 0);
@@ -153,14 +170,62 @@ public class MainActivity extends AppCompatActivity {
                     y2 = vec[3];
             Point start = new Point(x1, y1);
             Point end = new Point(x2, y2);
+            Line line = new Line(start, end);
+            if (Math.abs(x1 - x2) > Math.abs(y1-y2)) {
+                horizontals.add(line);
+            } else {
+                verticals.add(line);
+            }
 
-            Imgproc.line(cannyMat, start, end, new Scalar(255,0,0), 20, Imgproc.LINE_AA, 0);
-
+            // for visualization in debug mode
+            if (BuildConfig.DEBUG) {
+//                Imgproc.line(cannyMat, start, end, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
+            }
         }
+
+        // if we don't have at least 2 horizontal lines or vertical lines
+        if (horizontals.size() < 2) {
+            if (horizontals.size() == 0 || horizontals.get(0)._center.y > h_proc /2) {
+                horizontals.add(new Line(new Point(0,0),new Point(w_proc-1, 0)));
+            }
+            if (horizontals.size() == 0 || horizontals.get(0)._center.y <= h_proc /2) {
+                horizontals.add(new Line(new Point(0,h_proc-1),new Point(w_proc-1, h_proc-1)));
+            }
+        }
+        if (verticals.size() < 2) {
+            if (verticals.size() == 0 || verticals.get(0)._center.x > w_proc / 2) {
+                verticals.add(new Line(new Point(0, 0), new Point(h_proc - 1, 0)));
+            }
+            if (verticals.size() == 0 || verticals.get(0)._center.x <= w_proc / 2) {
+                verticals.add(new Line(new Point(w_proc - 1, 0), new Point(w_proc - 1, h_proc - 1)));
+            }
+        }
+
+        Collections.sort(horizontals, new Comparator<Line>() {
+            @Override
+            public int compare(Line lhs, Line rhs) {
+                return (int)(lhs._center.y - rhs._center.y);
+            }
+        });
+
+        Collections.sort(horizontals, new Comparator<Line>() {
+            @Override
+            public int compare(Line lhs, Line rhs) {
+                return (int)(lhs._center.x - rhs._center.x);
+            }
+        });
+
+        // for visualization in debug mode
+        if (BuildConfig.DEBUG) {
+            Imgproc.line(cannyMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
+            Imgproc.line(cannyMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
+            Imgproc.line(cannyMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
+            Imgproc.line(cannyMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
+        }
+
 
         Log.e("opencv","completed HoughLines");
         Log.e("opencv","linesMat size: " + linesMat.size());
-        Log.e("opencv","linesMat size: " + Double.toString(linesMat.size().height) + " x " +Double.toString(linesMat.size().width));
         Log.e("opencv", "linesBitmap size: " + Integer.toString(linesBitmap.getHeight()) +" x " + Integer.toString(linesBitmap.getWidth()));
         Utils.matToBitmap(cannyMat, cannyBitmap); //convert mat to bitmap
         img.setImageBitmap(cannyBitmap);
