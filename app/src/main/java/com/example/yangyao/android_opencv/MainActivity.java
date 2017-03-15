@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // resize
-        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card4, o);
+        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test9, o);
 
         int w = origBitmap.getWidth();
         int h = origBitmap.getHeight();
@@ -143,6 +143,37 @@ public class MainActivity extends AppCompatActivity {
         // grayscale
         Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);//rgbMat to gray grayMat
         Utils.matToBitmap(grayMat, grayBitmap); //convert mat to bitmap
+        img.setImageBitmap(grayBitmap);
+    }
+
+    protected void canny(ImageView img) {
+
+        Mat rgbMat = new Mat();
+        Mat grayMat = new Mat();
+        BitmapFactory.Options o=new BitmapFactory.Options();
+
+        // TODO: 29/08/2016  May need to check sample size https://developer.android.com/training/displaying-bitmaps/load-bitmap.html
+        o.inSampleSize = 4;
+        o.inDither=false;
+
+
+        // resize
+        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test9, o);
+
+        int w = origBitmap.getWidth();
+        int h = origBitmap.getHeight();
+        int min_w = 800;
+        double scale = Math.min(10.0, w*1.0/ min_w);
+        int w_proc = (int) (w * 1.0 / scale);
+        int h_proc = (int) (h * 1.0 / scale);
+        srcBitmap = Bitmap.createScaledBitmap(origBitmap, w_proc, h_proc, false);
+        grayBitmap = Bitmap.createBitmap(w_proc, h_proc, Bitmap.Config.RGB_565);
+        Utils.bitmapToMat(srcBitmap, rgbMat);//convert original bitmap to Mat, R G B.
+
+        // grayscale
+        Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);//rgbMat to gray grayMat
+        Mat cannyMat = getCanny(grayMat);
+        Utils.matToBitmap(cannyMat, grayBitmap); //convert mat to bitmap
         img.setImageBitmap(grayBitmap);
     }
 
@@ -164,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // resize
-        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.card4, o);
+        origBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test9, o);
 
         int w = origBitmap.getWidth();
         int h = origBitmap.getHeight();
@@ -263,10 +294,6 @@ public class MainActivity extends AppCompatActivity {
 
         // for visualization in debug mode
         if (BuildConfig.DEBUG) {
-//            Imgproc.line(rgbMat, horizontals.get(0)._p1, horizontals.get(0)._p2, new Scalar(0,255,0), 10, Imgproc.LINE_AA, 0);
-//            Imgproc.line(rgbMat, horizontals.get(horizontals.size()-1)._p1, horizontals.get(horizontals.size()-1)._p2, new Scalar(0,255,0), 10, Imgproc.LINE_AA, 0);
-//            Imgproc.line(rgbMat, verticals.get(0)._p1, verticals.get(0)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
-//            Imgproc.line(rgbMat, verticals.get(verticals.size()-1)._p1, verticals.get(verticals.size()-1)._p2, new Scalar(255,0,0), 10, Imgproc.LINE_AA, 0);
         }
 
         // compute intersections
